@@ -1,0 +1,39 @@
+package ${bussiPackage}.${entityPackage}.api.service;
+
+import java.util.List;
+import com.baomidou.mybatisplus.extension.service.IService;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+
+
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+public interface ${entityName}Service extends IService<${entityName}>  {
+
+    /**
+     * 添加
+     * @param ${entityName?uncap_first}
+     */
+    void save${entityName}(${entityName} ${entityName?uncap_first}) ;
+
+    /**
+     * 修改
+     * @param ${entityName?uncap_first}
+     */
+    void update${entityName}(${entityName} ${entityName?uncap_first});
+
+    /**
+     * 删除
+     * @param id
+     */
+    void del${entityName} (String id);
+
+    /**
+     * 批量删除
+     * @param idList
+     */
+    void delBatch${entityName} (List<String> idList);
+}

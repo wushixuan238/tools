@@ -1,0 +1,45 @@
+<#list subTables as subTab>
+<#assign originalForeignKeys = subTab.originalForeignKeys>
+#segment#${subTab.entityName}Mapper.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${bussiPackage}.${entityPackage}.mapper.${subTab.entityName}Mapper">
+     <resultMap id="${subTab.entityName}ResultMap"  type="${bussiPackage}.${entityPackage}.entity.${subTab.entityName}"> 
+<#list subTab.originalColumns as po>
+        <result column="${po.fieldDbName}" property="${po.fieldName}" jdbcType="${po.fieldDbType}" />
+</#list>
+    </resultMap>
+    
+    <sql id="base_column_list">
+    <#list subTab.originalColumns as po><#if po_index &gt;0>,</#if> ${po.fieldDbName} </#list>
+  </sql>
+
+	<delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE 
+		FROM  ${subTab.tableName} 
+		WHERE
+		<#list originalForeignKeys as key>
+		<#if key?lower_case?index_of("${primaryKeyField}")!=-1>
+			 ${key} = ${r'#'}{${primaryKeyField}} <#rt/>
+		<#else>
+			 ${key} = ${r'#'}{${key}} <#rt/>
+		</#if>
+		<#if key_has_next>AND</#if>
+		</#list>
+	</delete>
+	
+	<select id="selectByMainId" parameterType="java.lang.String" resultMap="${subTab.entityName}ResultMap">
+		SELECT <include refid="base_column_list" />
+		FROM  ${subTab.tableName}
+		WHERE
+		<#list originalForeignKeys as key>
+		<#if key?lower_case?index_of("${primaryKeyField}")!=-1>
+			 ${key} = ${r'#'}{${primaryKeyField}} <#rt/>
+		<#else>
+			 ${key} = ${r'#'}{${key}} <#rt/>
+		</#if>
+		<#if key_has_next>AND</#if>
+		</#list>
+	</select>
+</mapper>
+</#list>

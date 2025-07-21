@@ -1,0 +1,136 @@
+<template>
+  <div>
+    <tile-edit-page
+      ref="editPage"
+      :pageData="pageData"
+      :url="url"
+      @goBack="goBack" />
+  </div>
+</template>
+
+<script>
+import { tileEditPageMixin } from '@comp/template/tileStyle/tileEditPageMixin'
+export default {
+    mixins: [tileEditPageMixin],
+    name: '${entityName}Modal',
+    data () {
+        return {
+            pageData: {
+                title: '',
+            form: {
+ <#list columns as po><#rt/>
+    <#if po.fieldName !='id'  && po.fieldName !='deleted' && po.fieldName !='tenantId'>
+            ${po.fieldName}:'',
+     </#if>
+</#list>                               
+                            },
+                            validRules: {
+        <#list columns as po>
+            <#if po.fieldName !='id'  && po.fieldName !='deleted' && po.fieldName !='tenantId' >
+            <#if po.fieldDbType =='VARCHAR'>
+            ${po.fieldName}:[<#if po.nullable =='N'>{ required: true, message: '请输入${po.filedComment}!' },</#if>{max: ${po.charmaxLength}, message: '内容长度不能超过${po.charmaxLength}个字符'}],
+            </#if>
+            </#if>
+            </#list>                             
+                        },
+                panels: [
+                    {
+                        title: '基本信息',
+                        content: {
+                            type: 'form',
+                            ref: 'mainForm',
+                            list: [
+ <#list columns as po><#rt/>
+    <#if po.fieldName !='id'  && po.fieldName !='deleted' && po.fieldName !='tenantId'>
+            <#if po.fieldDbType =='DATE'>
+               {
+                type: 'date', 
+                label: '${po.filedComment}',
+                fieldName: '${po.fieldName}', 
+                placeholder: '请输入${po.filedComment}'
+            },
+            <#elseif po.fieldDbType =='TIMESTAMP'>
+             {
+                type: 'date', 
+                label: '${po.filedComment}',
+                fieldName: '${po.fieldName}', 
+                placeholder: '请输入${po.filedComment}'
+            },
+            <#elseif "int,decimal,double,"?contains(po.fieldType)>
+            {
+                type: 'number', 
+                label: '${po.filedComment}',
+                fieldName: '${po.fieldName}', 
+                placeholder: '请输入${po.filedComment}'
+            },
+            <#else>
+            {
+                type: 'input', 
+                label: '${po.filedComment}',
+                fieldName: '${po.fieldName}', 
+                placeholder: '请输入${po.filedComment}'
+            },
+            </#if>
+     </#if>
+</#list>                               
+                            ],
+                            
+                        button: []
+                        }
+                    },
+ <#list subTables as sub><#rt/>
+                    {
+                        title: '${sub.ftlDescription}',
+                        content: {
+                            type: 'table',
+                            ref: '${sub.entityName?uncap_first}List',
+                            columns: [
+                            { 
+                                    type: 'checkbox', width: 40 
+                                },
+<#list sub.colums as col><#rt/>
+            {
+              title: '${col.filedComment}',
+              field: '${col.fieldName}',
+              width: 100,
+              editRender: {name: 'AInput'}
+            },
+</#list>                                
+                            ],
+                            validRules: {
+<#list sub.colums as col><#rt/>
+            <#if col.fieldName !='id'  && col.fieldName !='deleted' && col.fieldName !='tenantId' >
+            <#if col.fieldDbType =='VARCHAR'>
+            ${col.fieldName}: [<#if col.nullable =='N'>{ required: true, message: '请输入${col.filedComment}!' },</#if>{max: ${col.charmaxLength}, message: '内容长度不能超过${col.charmaxLength}个字符'}],
+            </#if>
+            </#if>
+            </#list>                                
+                            },
+                            toolbarButton: [
+                            {title: '新增', type: 'primary', clickFn: this.addRow},
+                            {title: '删除', clickFn: this.deleteRow}
+                        ]
+                        },
+                        
+                    }
+ </#list> 
+                ]
+            },
+            url: {
+          add: "/${entityPackage}/${entityName?uncap_first}/add",
+          edit: "/${entityPackage}/${entityName?uncap_first}/edit",
+          detail: '/${entityPackage}/${entityName?uncap_first}/queryById'
+          }
+          
+        }
+    },
+    methods: {
+                deleteRow () {
+                    this.$refs.editPage.deleteRow()
+                },
+                addRow () {
+                    this.$refs.editPage.addRow()
+                }
+            }
+}
+</script>

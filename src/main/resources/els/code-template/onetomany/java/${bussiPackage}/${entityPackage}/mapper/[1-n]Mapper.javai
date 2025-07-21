@@ -1,0 +1,27 @@
+<#list subTables as subTab>
+#segment#${subTab.entityName}Mapper.java
+package ${bussiPackage}.${entityPackage}.mapper;
+
+import java.util.List;
+import ${bussiPackage}.${entityPackage}.entity.${subTab.entityName};
+import com.els.common.system.base.mapper.ElsBaseMapper;
+
+/**
+ * @Description: ${subTab.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+public interface ${subTab.entityName}Mapper extends ElsBaseMapper<${subTab.entityName}> {
+    
+    /**
+     * 通过主表 Id 删除
+     */
+	boolean deleteByMainId(String mainId);
+    
+    /**
+     * 通过主表 Id 查询
+     */
+	List<${subTab.entityName}> selectByMainId(String mainId);
+}
+</#list>

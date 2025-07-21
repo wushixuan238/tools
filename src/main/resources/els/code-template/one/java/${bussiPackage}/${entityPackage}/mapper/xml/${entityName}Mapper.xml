@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${bussiPackage}.${entityPackage}.mapper.${entityName}Mapper">
+    <resultMap id="${entityName}ResultMap"  type="${bussiPackage}.${entityPackage}.entity.${entityName}"> 
+<#list originalColumns as po>
+        <result column="${po.fieldDbName}" property="${po.fieldName}" jdbcType="${po.fieldDbType}" />
+</#list>
+    </resultMap>
+   <sql id="base_column_list">
+    <#list originalColumns as po><#if po_index &gt;0>,</#if> ${po.fieldDbName} </#list>
+  </sql>
+  
+  
+</mapper>

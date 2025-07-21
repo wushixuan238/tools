@@ -1,0 +1,17 @@
+package ${bussiPackage}.${entityPackage}.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import com.els.common.system.base.mapper.ElsBaseMapper;
+
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+public interface ${entityName}Mapper extends ElsBaseMapper<${entityName}> {
+
+}

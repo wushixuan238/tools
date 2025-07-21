@@ -1,0 +1,80 @@
+<template>
+  <div style="height:100%">
+      <list-layout
+      ref="listPage"
+      v-show="!showEditPage && !showDetailPage"
+      :pageData="pageData"
+      :url="url" />
+    <!-- 详情界面 -->
+    <${entityName?uncap_first}-detail
+        v-if="showDetailPage"
+        ref="detailPage"
+        :current-edit-row="currentEditRow"
+        @hide="hideEditPage"/>
+    <!-- 编辑页面 -->
+    <${entityName?uncap_first}-edit
+        v-if="showEditPage"
+        :current-edit-row="currentEditRow"
+        @hide="hideEditPage" />
+  </div>
+</template>
+<script>
+import PurchaseStrategyDetail from './modules/${entityName}Detail'
+import PurchaseStrategyEdit from './modules/${entityName}Edit'
+import {ListMixin} from '@comp/template/list/ListMixin'
+
+export default {
+    mixins: [ListMixin],
+    components: {
+        ${entityName}Detail,
+        ${entityName}Edit
+    },
+    data () {
+        return {
+            showEditPage: false,
+            pageData: {
+                formField: [
+                     {
+                        type: 'input',
+                        label: '关键字',
+                        fieldName: 'keyWord',
+                        placeholder: '请输入关键字'
+                    },
+<#list columns as po>
+<#if po.fieldName !='id' && po.fieldName !='tenantId'>
+                    {
+                        type: 'input',
+                        label: '${po.filedComment}',
+                        fieldName: '${po.fieldName}',
+                        placeholder: '请输入${po.filedComment}'
+                    },
+</#if>
+</#list>
+                ],
+                form: {
+                    keyWord: '',
+<#list columns as po>
+<#if po.fieldName !='id' && po.fieldName !='tenantId'>
+                    ${po.fieldName}: '',
+</#if>
+</#list>
+                }
+            },
+            url: {
+              add: "/${entityPackage}/${entityName?uncap_first}/add",
+              list: "/${entityPackage}/${entityName?uncap_first}/list",
+              delete: "/${entityPackage}/${entityName?uncap_first}/delete",
+              deleteBatch: "/${entityPackage}/${entityName?uncap_first}/deleteBatch",
+              exportXlsUrl: "${entityPackage}/${entityName?uncap_first}/exportXls",
+              importExcelUrl: "${entityPackage}/${entityName?uncap_first}/importExcel",
+              columns: '${entityName?uncap_first}List'
+           },
+        }
+    },
+    methods: {
+        handleExportXls () {
+            this.$refs.listPage.handleExportXls('${tableVo.ftlDescription}')
+        }
+    }
+}
+</script>

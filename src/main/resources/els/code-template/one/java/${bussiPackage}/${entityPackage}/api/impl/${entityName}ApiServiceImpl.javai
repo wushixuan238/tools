@@ -1,0 +1,46 @@
+package ${bussiPackage}.${entityPackage}.api.service.impl;
+
+import ${bussiPackage}.${entityPackage}.dto.${entityName}Dto;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import ${bussiPackage}.${entityPackage}.api.${entityName}ApiService;
+import ${bussiPackage}.${entityPackage}.service.${entityName}Service;
+import com.els.common.util.SysUtil;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import com.els.modules.base.service.impl.BaseServiceImpl;
+
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+@Service
+public class ${entityName}ApiServiceImpl implements ${entityName}ApiService {
+
+    @Autowired
+    private ${entityName}Service ${entityName}Service;
+
+
+    @Override
+    public void save${entityName}(${entityName}Dto ${entityName?uncap_first}Dto) {
+         ${entityName} ${entityName} = SysUtil.copyProperties(${entityName?uncap_first}Dto, ${entityName}.class);
+         ${entityName}Service.save${entityName}(${entityName}(${entityName?uncap_first});
+    }
+
+    @Override
+    public void update${entityName}(${entityName}Dto ${entityName?uncap_first}Dto) {
+        ${entityName} ${entityName} = SysUtil.copyProperties(${entityName?uncap_first}Dto, ${entityName}.class);
+        ${entityName}Service.update${entityName}(${entityName}(${entityName?uncap_first});
+    }
+
+    @Override
+    public void del${entityName}(String id) {
+        ${entityName}Service.del${entityName}(id);
+    }
+
+    @Override
+    public void delBatch${entityName}(List<String> idList) {
+        ${entityName}Service.delBatch${entityName}(idList);
+    }
+}

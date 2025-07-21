@@ -1,0 +1,97 @@
+<template>
+    <div class="${entityName}Detail">
+        <a-spin :spinning="confirmLoading">
+            <business-layout
+                    modelLayout="tab"
+                    pageStatus="detail"
+                    ref="businessRef"
+                    v-on="businessHandler"
+                    :remoteJsFilePath="remoteJsFilePath"
+                    :requestData="requestData"
+                    :externalToolBar="externalToolBar"
+                    :pageHeaderButtons="pageHeaderButtons"
+                    :handleAfterDealSource="handleAfterDealSource"
+                    :handleBeforeRemoteConfigData="handleBeforeRemoteConfigData"
+            >
+            </business-layout>
+        </a-spin>
+    </div>
+</template>
+
+<script>
+    import BusinessLayout from '@comp/template/business/BusinessLayout'
+    import fieldSelectModal from '@comp/template/fieldSelectModal'
+    import {businessUtilMixin} from '@comp/template/business/businessUtilMixin.js'
+    import {getAction, postAction} from '@/api/manage'
+
+    export default {
+        name: '${entityName}Detail',
+        components: {
+            BusinessLayout,
+            fieldSelectModal
+        },
+        mixins: [businessUtilMixin],
+        props: {
+            currentEditRow: {
+                required: true,
+                type: Object,
+                default: () => {
+                    return {}
+                }
+            }
+        },
+        data() {
+            return {
+                currentBasePath: this.$variateConfig['domianURL'],
+                flowView: false,
+                flowId: 0,
+                confirmLoading: false,
+                businessRefName: 'businessRef',
+                curGroupCode: '',
+                fieldSelectType: '',
+                requestData: {
+                    detail: {
+                        url: '/${entityPackage}/${entityName?uncap_first}/queryById', args: (that) => {
+                            return {id: that.currentEditRow.id}
+                        }
+                    }
+                },
+                externalToolBar: {},
+                pageHeaderButtons: [
+                    {
+                        title: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_back`'}, '返回'),
+                        key: 'goBack'
+                    }
+                ],
+                url: {
+                    submit: '/${entityPackage}/${entityName?uncap_first}/edit',
+                }
+            }
+        },
+        computed: {
+            remoteJsFilePath() {
+                let templateNumber = this.currentEditRow.templateNumber
+                let templateVersion = this.currentEditRow.templateVersion
+                let account = this.currentEditRow.templateAccount || this.currentEditRow.busAccount
+                return ${r'`${account}/purchase_${entityPackage}_${templateNumber}_${templateVersion}`'}
+            }
+        },
+        methods: {
+            handleBeforeRemoteConfigData() {
+                return {
+                    groups: [],
+                    itemColumns: []
+                }
+            },
+            handleAfterDealSource(pageConfig, resultData) {
+                let formModel = pageConfig.groups[0].formModel
+                for (let key in resultData) {
+                    formModel[key] = resultData[key]
+                }
+            },
+            goBack() {
+                this.$parent.hideEditPage()
+            }
+        }
+    }
+</script>

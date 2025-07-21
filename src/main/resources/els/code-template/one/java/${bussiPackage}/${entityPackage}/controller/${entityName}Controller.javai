@@ -1,0 +1,90 @@
+package ${bussiPackage}.${entityPackage}.controller;
+
+import java.util.Arrays;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import com.els.common.api.vo.Result;
+import com.els.common.system.query.QueryGenerator;
+import com.els.common.aspect.annotation.AutoLog;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import ${bussiPackage}.${entityPackage}.service.${entityName}Service;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.els.common.constant.CommonConstant;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
+import com.alibaba.fastjson.JSON;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import com.els.common.system.base.controller.BaseController;
+
+ /**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+@Api(tags="${tableVo.ftlDescription}")
+@RestController
+@RequestMapping("/${entityPackage}/${entityName?uncap_first}")
+public class ${entityName}Controller extends BaseController<${entityName}, ${entityName}Service> {
+	@Autowired
+	private ${entityName}Service ${entityName?uncap_first}Service;
+
+	@ApiOperation(value="分页列表查询", notes="分页列表查询")
+	@GetMapping(value = "/list")
+	public Result<?> queryPageList(${entityName} ${entityName?uncap_first},
+								   @RequestParam(name = PAGE_NO, defaultValue = DEFAULT_PAGE_NO) Integer pageNo,
+                                    @RequestParam(name = PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) Integer pageSize,
+								   HttpServletRequest req) {
+		QueryWrapper<${entityName}> queryWrapper = QueryGenerator.initQueryWrapper(${entityName?uncap_first}, req.getParameterMap());
+		Page<${entityName}> page = new Page<>(pageNo, pageSize);
+		IPage<${entityName}> pageList = ${entityName?uncap_first}Service.page(page, queryWrapper);
+		return Result.ok(pageList);
+	}
+
+	@AutoLog(value = "${tableVo.ftlDescription}-添加")
+	@ApiOperation(value="添加", notes="添加")
+	@PostMapping(value = "/add")
+	public Result<?> add(@RequestBody ${entityName} ${entityName?uncap_first}) {
+		${entityName?uncap_first}Service.save${entityName}(${entityName?uncap_first});
+		return Result.ok(${entityName?uncap_first});
+	}
+
+	@AutoLog(value = "${tableVo.ftlDescription}-编辑")
+	@ApiOperation(value="编辑", notes="编辑")
+	@PostMapping(value = "/edit")
+	public Result<?> edit(@RequestBody ${entityName} ${entityName?uncap_first}) {
+		${entityName?uncap_first}Service.update${entityName}(${entityName?uncap_first});
+		return commonSuccessResult(CommonConstant.OPERATE_TYPE_EDIT);
+	}
+
+	@AutoLog(value = "${tableVo.ftlDescription}-通过id删除")
+	@ApiOperation(value="通过id删除", notes="通过id删除")
+	@GetMapping(value = "/delete")
+	public Result<?> delete(@RequestParam(name="id") String id) {
+		${entityName?uncap_first}Service.del${entityName}(id);
+		return commonSuccessResult(CommonConstant.OPERATE_TYPE_DELETE);
+	}
+
+	@AutoLog(value = "${tableVo.ftlDescription}-批量删除")
+	@ApiOperation(value="批量删除", notes="批量删除")
+	@GetMapping(value = "/deleteBatch")
+	public Result<?> deleteBatch(@RequestParam(name="ids") String ids) {
+		List<String> idList = Arrays.asList(ids.split(","));
+		this.${entityName?uncap_first}Service.delBatch${entityName}(idList);
+		return commonSuccessResult(CommonConstant.OPERATE_TYPE_DELETE);
+	}
+
+	@ApiOperation(value="通过id查询", notes="通过id查询")
+	@GetMapping(value = "/queryById")
+	public Result<?> queryById(@RequestParam(name="id") String id) {
+		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
+		return Result.ok(${entityName?uncap_first});
+	}
+}

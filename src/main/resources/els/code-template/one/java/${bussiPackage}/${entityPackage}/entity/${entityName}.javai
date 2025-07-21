@@ -1,0 +1,57 @@
+package ${bussiPackage}.${entityPackage}.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.math.BigDecimal;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+import com.els.common.system.base.entity.BaseEntity;
+
+
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+@Data
+@TableName("${tableName}")
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@ApiModel(value="${tableName}对象", description="${tableVo.ftlDescription}")
+public class ${entityName} extends BaseEntity {
+	private static final long serialVersionUID = 1L;
+    
+    <#list columns as po>
+	/**${po.filedComment}*/
+	<#if po.fieldName == primaryKeyField>
+	@TableId(type = IdType.ASSIGN_ID)
+	<#else>
+  <#if po.fieldType =='java.util.Date'>
+	<#if po.fieldDbType =='DATE'>
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+	<#elseif po.fieldDbType =='TIMESTAMP'>
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	</#if>
+  </#if>
+  </#if>
+    @ApiModelProperty(value = "${po.filedComment}", position = ${po_index + 2})
+    @TableField("${po.fieldDbName}")
+    <#if po.charmaxLength != ''>
+    @SrmLength(max = ${po.charmaxLength})
+    </#if>
+	private <#if po.fieldType=='java.sql.Blob'>byte[]<#else>${po.fieldType2}</#if> ${po.fieldName};
+	</#list>
+}

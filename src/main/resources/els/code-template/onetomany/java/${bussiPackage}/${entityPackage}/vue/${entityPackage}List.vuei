@@ -1,0 +1,159 @@
+<template>
+    <div style="height:100%">
+        <list-layout
+                v-show="!showEditPage && !showDetailPage"
+                ref="listPage"
+                :pageData="pageData"
+                :url="url"
+                @afterChangeTab="handleAfterChangeTab"/>
+        <!-- 编辑界面 -->
+        <${entityName?uncap_first}Edit
+                v-if="showEditPage"
+                ref="editPage"
+                :current-edit-row="currentEditRow"
+                @hide="handleList"/>
+        <!-- 详情界面 -->
+        <${entityName?uncap_first}Detail
+                v-if="showDetailPage"
+                ref="detailPage"
+                :current-edit-row="currentEditRow"
+                @hide="handleList"/>
+    </div>
+</template>
+<script>
+    import ${entityName}Edit from './modules/${entityName}Edit'
+    import ${entityName}Detail from './modules/${entityName}Detail'
+    import {ListMixin} from '@comp/template/list/ListMixin'
+    import {getAction} from '@/api/manage'
+
+    export default {
+        mixins: [ListMixin],
+        components: {
+            ${entityName}Edit,
+            ${entityName}Detail
+        },
+        data() {
+            return {
+                showDetailPage: false,
+                showEditPage: false,
+                currentResultRow: {},
+                pageData: {
+                    businessType: '${entityPackage}',
+                    formField: [
+                        {
+                            type: 'input',
+                            label: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_keyword`'}, '关键字'),
+                            fieldName: 'keyWord',
+                            placeholder: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_pleaseInputThekeyword`'}, '请输入关键字')
+                        }
+                    ],
+                    form: {
+                        keyWord: ''
+                    },
+                    button: [
+                        {
+                            allow: () => {
+                                return this.btnInvalidAuth('${entityName?uncap_first}:add')
+                            },
+                            label: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_add`'}, '新增'),
+                            icon: 'plus',
+                            clickFn: this.handleAdd,
+                            type: 'primary'
+                        },
+                        {
+                            label: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_listCustom`'}, '列自定义'),
+                            icon: 'setting',
+                            clickFn: this.settingColumns
+                        },
+                        {
+                            label: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_helpText`'}, '帮助说明'),
+                            icon: 'file-text',
+                            folded: true,
+                            clickFn: this.showHelpText
+                        },
+                        {
+                            label: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_attachmentExplain`'}, '附件说明'),
+                            icon: 'file-pdf',
+                            folded: true,
+                            clickFn: this.showHelpPDF
+                        }
+                    ],
+                    optColumnWidth: 250,
+                    optColumnList: [
+                        {
+                            type: 'view',
+                            title: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_see`'}, '查看'),
+                            clickFn: this.handleView
+                        },
+                        {
+                            type: 'edit',
+                            title: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_edit`'}, '编辑'),
+                            clickFn: this.handleEdit,
+                            allow: this.showEdit
+                        },
+                        {
+                            type: 'delete',
+                            title: this.$srmI18n(${r'`${this.$getLangAccount()}#i18n_title_delete`'}, '删除'),
+                            clickFn: this.handleDelete,
+                            allow: this.showDelete
+                        }
+                    ]
+                },
+                url: {
+                    list: "/${entityPackage}/${entityName?uncap_first}/list",
+                    add: "/${entityPackage}/${entityName?uncap_first}/add",
+                    delete: "/${entityPackage}/${entityName?uncap_first}/delete",
+                    deleteBatch: "/${entityPackage}/${entityName?uncap_first}/deleteBatch",
+                    exportXlsUrl: "${entityPackage}/${entityName?uncap_first}/exportXls",
+                    importExcelUrl: "${entityPackage}/${entityName?uncap_first}/importExcel",
+                    columns: '${entityName?uncap_first}'
+                }
+            }
+        },
+        methods: {
+            handleResultRecord(row) {
+                this.currentEditRow = row
+                this.showResultPage = true
+                this.showEditPage = false
+                this.showDetailPage = false
+            },
+            handleDetail(row) {
+                this.currentEditRow = row
+                this.showResultPage = false
+                this.showEditPage = false
+                this.showDetailPage = true
+            },
+            handleList() {
+                this.showResultPage = false
+                this.showEditPage = false
+                this.showDetailPage = false
+                this.$store.dispatch('SetTabConfirm', false)
+                this.searchEvent()
+            },
+            submitCallBack(row) {
+                this.currentEditRow = row
+                this.showEditPage = false
+                this.showDetailPage = true
+                this.searchEvent()
+            },
+            showEdit(row) {
+                if (this.btnInvalidAuth('${entityName?uncap_first}:edit')) {
+                    return true
+                }
+                return row.infoStatus == 'new' && row.auditStatus == '0' ? false : true
+            },
+            showInvalid(row) {
+                if (this.btnInvalidAuth('${entityName?uncap_first}:invalid')) {
+                    return true
+                }
+                return row.infoStatus == 'publish' ? false : true
+            },
+            showDelete(row) {
+                if (this.btnInvalidAuth('${entityName?uncap_first}:delete')) {
+                    return true
+                }
+                return row.infoStatus == 'new' && row.auditStatus == '0' ? false : true
+            }
+        }
+    }
+</script>

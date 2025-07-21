@@ -1,0 +1,37 @@
+package ${bussiPackage}.${entityPackage}.vo;
+
+import java.util.List;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+<#list subTables as sub>
+import ${bussiPackage}.${entityPackage}.entity.${sub.entityName};
+</#list>
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import java.util.ArrayList;
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(callSuper = true)
+public class ${entityName}VO extends ${entityName} {
+	
+	private static final long serialVersionUID = 1L;
+	
+	<#list subTables as sub>
+	private List<${sub.entityName}> ${sub.entityName?uncap_first}List;
+
+	</#list>
+	
+}

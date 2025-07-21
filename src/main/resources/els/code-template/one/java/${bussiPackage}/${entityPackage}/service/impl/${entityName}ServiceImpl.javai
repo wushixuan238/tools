@@ -1,0 +1,38 @@
+package ${bussiPackage}.${entityPackage}.service.impl;
+
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import ${bussiPackage}.${entityPackage}.mapper.${entityName}Mapper;
+import ${bussiPackage}.${entityPackage}.service.${entityName}Service;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import com.els.common.system.base.service.impl.BaseServiceImpl;
+
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+@Service
+public class ${entityName}ServiceImpl extends BaseServiceImpl<${entityName}Mapper, ${entityName}> implements ${entityName}Service {
+
+    @Override
+    public void save${entityName}(${entityName} ${entityName?uncap_first}) {
+         baseMapper.insert(${entityName?uncap_first});
+    }
+
+    @Override
+    public void update${entityName}(${entityName} ${entityName?uncap_first}) {
+        baseMapper.updateById(${entityName?uncap_first});
+    }
+
+    @Override
+    public void del${entityName}(String id) {
+        baseMapper.deleteById(id);
+    }
+
+    @Override
+    public void delBatch${entityName}(List<String> idList) {
+        baseMapper.deleteBatchIds(idList);
+    }
+}

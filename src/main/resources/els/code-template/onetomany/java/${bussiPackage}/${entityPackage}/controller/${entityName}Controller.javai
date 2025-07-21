@@ -1,0 +1,132 @@
+package ${bussiPackage}.${entityPackage}.controller;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import com.els.common.system.vo.LoginUser;
+import org.apache.shiro.SecurityUtils;
+import com.els.framework.poi.excel.ExcelImportUtil;
+import com.els.framework.poi.excel.entity.vo.NormalExcelConstants;
+import com.els.framework.poi.excel.entity.ExportParams;
+import com.els.framework.poi.excel.entity.ImportParams;
+import com.els.framework.poi.excel.view.ELSEntityExcelView;
+
+import com.els.common.api.vo.Result;
+import com.els.common.system.query.QueryGenerator;
+<#list subTables as sub>
+import ${bussiPackage}.${entityPackage}.entity.${sub.entityName};
+</#list>
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import ${bussiPackage}.${entityPackage}.vo.${entityName}VO;
+import ${bussiPackage}.${entityPackage}.service.${entityName}Service;
+<#list subTables as sub>
+import ${bussiPackage}.${entityPackage}.service.${sub.entityName}Service;
+</#list>
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
+import com.els.common.constant.CommonConstant;
+import com.els.common.system.base.controller.BaseController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import com.els.common.aspect.annotation.AutoLog;
+ /**
+ * @Description: ${tableVo.ftlDescription}
+ * @Author: ${author}
+ * @Date:   ${.now?string["yyyy-MM-dd"]}
+ * @Version: V1.0
+ */
+@RestController
+@RequestMapping("/${entityPackage}/${entityName?uncap_first}")
+@Api(tags="${tableVo.ftlDescription}")
+@Slf4j
+public class ${entityName}Controller extends BaseController<${entityName}, ${entityName}Service> {
+	@Autowired
+	private ${entityName}Service ${entityName?uncap_first}Service;
+	<#list subTables as sub>
+	@Autowired
+	private ${sub.entityName}Service ${sub.entityName?uncap_first}Service;
+	</#list>
+
+    @ApiOperation(value="分页列表查询", notes="分页列表查询")
+	@GetMapping(value = "/list")
+	public Result<?> queryPageList(${entityName} ${entityName?uncap_first},
+								   @RequestParam(name = PAGE_NO, defaultValue = DEFAULT_PAGE_NO) Integer pageNo,
+            @RequestParam(name = PAGE_SIZE, defaultValue = DEFAULT_PAGE_SIZE) Integer pageSize,
+								   HttpServletRequest req) {
+		QueryWrapper<${entityName}> queryWrapper = QueryGenerator.initQueryWrapper(${entityName?uncap_first}, req.getParameterMap());
+		Page<${entityName}> page = new Page<>(pageNo, pageSize);
+		IPage<${entityName}> pageList = ${entityName?uncap_first}Service.page(page, queryWrapper);
+		return Result.ok(pageList);
+	}
+
+	@AutoLog(busModule = "${tableVo.ftlDescription}" , value = "添加")
+    @ApiOperation(value="添加", notes="添加")
+	@PostMapping(value = "/add")
+	public Result<?> add(@RequestBody ${entityName}VO ${entityName?uncap_first}Page) {
+		${entityName} ${entityName?uncap_first} = new ${entityName}();
+		BeanUtils.copyProperties(${entityName?uncap_first}Page, ${entityName?uncap_first});
+		${entityName?uncap_first}Service.saveMain(${entityName?uncap_first}, <#list subTables as sub>${entityName?uncap_first}Page.get${sub.entityName}List()<#if sub_has_next>,</#if></#list>);
+		return Result.ok(${entityName?uncap_first});
+	}
+
+	@AutoLog(busModule = "${tableVo.ftlDescription}" , value = "编辑")
+    @ApiOperation(value="编辑", notes="编辑")
+	@PostMapping(value = "/edit")
+	public Result<?> edit(@RequestBody ${entityName}VO ${entityName?uncap_first}Page) {
+		${entityName} ${entityName?uncap_first} = new ${entityName}();
+		BeanUtils.copyProperties(${entityName?uncap_first}Page, ${entityName?uncap_first});
+		${entityName?uncap_first}Service.updateMain(${entityName?uncap_first}, <#list subTables as sub>${entityName?uncap_first}Page.get${sub.entityName}List()<#if sub_has_next>,</#if></#list>);
+		return commonSuccessResult(CommonConstant.OPERATE_TYPE_EDIT);
+	}
+
+	@AutoLog(busModule = "${tableVo.ftlDescription}" , value = "通过id删除")
+    @ApiOperation(value="通过id删除", notes="通过id删除")
+	@GetMapping(value = "/delete")
+	public Result<?> delete(@RequestParam(name="id") String id) {
+	    ${entityName?uncap_first}Service.delMain(id);
+		return commonSuccessResult(CommonConstant.OPERATE_TYPE_DELETE);
+	}
+
+	@AutoLog(busModule = "${tableVo.ftlDescription}" , value = "批量删除")
+    @ApiOperation(value="批量删除", notes="批量删除")
+	@GetMapping(value = "/deleteBatch")
+	public Result<?> deleteBatch(@RequestParam(name="ids") String ids) {
+		this.${entityName?uncap_first}Service.delBatchMain(Arrays.asList(ids.split(",")));
+		return commonSuccessResult(CommonConstant.OPERATE_TYPE_DELETE);
+	}
+
+    @ApiOperation(value="通过id查询", notes="通过id查询")
+	@GetMapping(value = "/queryById")
+	public Result<?> queryById(@RequestParam(name="id") String id) {
+		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
+		${entityName}VO ${entityName?uncap_first}VO = new ${entityName}VO();
+        BeanUtils.copyProperties(${entityName?uncap_first}, ${entityName?uncap_first}VO);
+		<#list subTables as sub>
+		List<${sub.entityName}> ${sub.entityName?uncap_first}List = ${sub.entityName?uncap_first}Service.selectByMainId(id);	
+		${entityName?uncap_first}VO.set${sub.entityName}List(${sub.entityName?uncap_first}List);
+		</#list>
+		return Result.ok(${entityName?uncap_first}VO);
+	}
+	
+	<#list subTables as sub>
+    @ApiOperation(value="通过${tableVo.ftlDescription}id查询${sub.ftlDescription}", notes="通过${tableVo.ftlDescription}id查询${sub.ftlDescription}")
+	@GetMapping(value = "/query${sub.entityName}ByMainId")
+	public Result<?> query${sub.entityName}ListByMainId(@RequestParam(name="id") String id) {
+		List<${sub.entityName}> ${sub.entityName?uncap_first}List = ${sub.entityName?uncap_first}Service.selectByMainId(id);
+		return Result.ok(${sub.entityName?uncap_first}List);
+	}
+	</#list>
+}

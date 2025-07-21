@@ -1,0 +1,99 @@
+<template>
+  <div class="page-container">
+    <edit-layout
+      ref="editPage"
+      :page-data="pageData"
+      :url="url" />
+    <field-select-modal
+      ref="fieldSelectModal" />
+    <!-- 加载配置文件 -->
+    <remote-js
+      :src="fileSrc"
+      @load="loadSuccess"
+      @error="loadError" />
+  </div>
+</template>
+
+<script>
+
+import { EditMixin } from '@comp/template/edit/EditMixin'
+import fieldSelectModal from '@comp/template/fieldSelectModal'
+
+export default {
+    name: '${entityName}Modal',
+    mixins: [EditMixin],
+    data () {
+        return {
+            pageData: {
+                form: {},
+                groups: [
+                    { groupName: '${tableVo.ftlDescription}行信息', groupCode: 'itemInfo', type: 'grid', custom: {
+                        ref: '',
+                        columns: [],
+                        buttons: [
+                            {title: '添加', type: 'primary', click: this.insertGridItem},
+                            {title: '删除', click: this.deleteGridItem}
+                        ]
+                    } },
+                ],
+                formFields: [],
+                publicBtn: [
+                    { title: '上一步', click: this.prevEvent },
+                    { title: '下一步', type: 'primary', click: this.nextEvent },
+                    { title: '保存', type: 'primary', click: this.saveEvent },
+                    { title: '发布', type: 'primary', click: this.publishEvent },
+                    { title: '返回', click: this.goBack }
+                ]
+            },
+            url: {
+              add: "/${entityPackage}/${entityName?uncap_first}/add",
+              edit: "/${entityPackage}/${entityName?uncap_first}/edit",
+              detail: '/${entityPackage}/${entityName?uncap_first}/queryById',
+              public: '/${entityPackage}/${entityName?uncap_first}/publish',
+              upload: '/els/attachment/purchaseAttachment/upload'
+            }
+        }
+    },
+    computed: {
+        fileSrc () {
+            let templateNumber = this.currentEditRow.templateNumber
+            let templateVersion = this.currentEditRow.templateVersion
+            let elsAccount = this.$ls.get('Login_elsAccount')
+            let time = new Date().getTime()
+            return `${left}`this.$variateConfig['configFiles']${right}/${left}elsAccount${right}/purchase_${entityPackage}_${left}templateNumber${right}_${left}templateVersion${right}.js?t=`+time
+        }
+    },
+    methods: {
+        //新增行
+        insertGridItem() {
+            let itemGrid = this.$refs.editPage.$refs.List[0]
+            let itemData = {}
+            this.pageConfig.itemColumns.forEach(item => {
+                if(item.defaultValue) {
+                    itemData[item.field] = item.defaultValue
+                }
+            })
+            itemGrid.insert([itemData])
+        },
+        //删除复选框选定行
+        deleteGridItem() {
+            let itemGrid = this.$refs.editPage.$refs.List[0]
+            let checkboxRecords = itemGrid.getCheckboxRecords()
+            if(!checkboxRecords.length) {
+                this.$message.warning('请选择数据！')
+                return
+            }
+            itemGrid.removeCheckboxRow()
+        },
+        goBack () {
+            this.$emit('hide')
+        },
+        saveEvent () {
+            this.$refs.editPage.postData()
+        },
+        publishEvent () {
+            this.$refs.editPage.handleSend()
+        }
+    }
+}
+</script>
